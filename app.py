@@ -119,18 +119,49 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 app.title=tabtitle
 
-########### Set up the layout
-app.layout = html.Div(children=[
-    html.H1(myheading),
-    dcc.Graph(
-        id='flyingdog',
-        figure=beer_fig
-    ),
-    html.A('Code on Github', href=githublink),
+# Layout der App
+# das Stylesheet ändert primär Schriftarten
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+# Erzeuge den Anfangsplot - hier wird n auf 64 gesetzt
+fig = go.Figure(data=generate_network(64),  # hier wird die Funktion von oben benutzt
+              layout=go.Layout(
+                showlegend=False,
+                hovermode='closest',
+                margin=dict(b=20,l=5,r=5,t=40), # ab hier nur Styling
+                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                )
+
+app.layout = html.Div([
+    html.H1("Hello"),
+    html.Div("Have fun with the progam!"),
     html.Br(),
-    html.A('Data Source', href=sourceurl),
-    ]
-)
+    dcc.Input(id='topic', type='text', value='None'),
+    dcc.Input(id='depth', type='number', value=64),
+    html.Button(id='submit-button-state', n_clicks=0, children='Start'),
+    html.Div(id='output-state'),
+    html.Br(),
+    dcc.Graph(
+        id='example-graph',
+        figure=fig
+    )
+])
+
+
+########### Set up the layout
+#app.layout = html.Div(children=[
+#    html.H1(myheading),
+#    dcc.Graph(
+#        id='flyingdog',
+#        figure=beer_fig
+#    ),
+#    html.A('Code on Github', href=githublink),
+#    html.Br(),
+#    html.A('Data Source', href=sourceurl),
+#    ]
+#)
 
 if __name__ == '__main__':
     app.run_server()
