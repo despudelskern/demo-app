@@ -119,10 +119,6 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 app.title=tabtitle
 
-# Layout der App
-# das Stylesheet ändert primär Schriftarten
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 # Erzeuge den Anfangsplot - hier wird n auf 64 gesetzt
 fig = go.Figure(data=generate_network(64),  # hier wird die Funktion von oben benutzt
