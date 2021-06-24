@@ -1,10 +1,10 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output, State
+
 import plotly.graph_objs as go
-
 import networkx as nx
-
 
 
 ###########
@@ -90,28 +90,6 @@ label2='ABV'
 githublink='https://github.com/austinlasseter/flying-dog-beers'
 sourceurl='https://www.flyingdog.com/beers/'
 
-########### Set up the chart
-bitterness = go.Bar(
-    x=beers,
-    y=ibu_values,
-    name=label1,
-    marker={'color':color1}
-)
-alcohol = go.Bar(
-    x=beers,
-    y=abv_values,
-    name=label2,
-    marker={'color':color2}
-)
-
-beer_data = [bitterness, alcohol]
-beer_layout = go.Layout(
-    barmode='group',
-    title = mytitle
-)
-
-beer_fig = go.Figure(data=beer_data, layout=beer_layout)
-
 
 ########### Initiate the app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -145,19 +123,59 @@ app.layout = html.Div([
     )
 ])
 
+#===============================================================================
+# Callbacks - Interaktion mit der Benutzeroberfläche
 
-########### Set up the layout
-#app.layout = html.Div(children=[
-#    html.H1(myheading),
-#    dcc.Graph(
-#        id='flyingdog',
-#        figure=beer_fig
-#    ),
-#    html.A('Code on Github', href=githublink),
-#    html.Br(),
-#    html.A('Data Source', href=sourceurl),
-#    ]
-#)
+
+# Mit @ wird ein sogenannter "Decorater" benutzt.
+# Der Decorator führt dazu, dass die Funktion, die darunter deklariert wird
+# (hier update_output) die Funktionalität des Decorators erhält.
+# Hier werden Input, Output, State vom Paket dash.dependencies verwendet (siehe import).
+# Wichtig ist, dass Inputs und Outputs mit den Argumenten und Returns der Funktion zusammenpassen!
+
+@app.callback(Output('output-state', 'children'),
+              Input('submit-button-state', 'n_clicks'),
+              State('topic', 'value'),
+              State('depth', 'value'))
+
+def update_output(n_clicks, input1, input2):
+    '''
+    displays the user inputs on the page
+    @param n_clicks: [Integer] Anzahl, wie oft Programm gestartet wurde
+    @param input1: [String] Suchbegriff
+    @param input2: [Integer] Tiefe
+    '''
+
+    return u'''
+        The program was started {} times,\n
+        the topic is "{}",
+        and the depth is "{}"
+    '''.format(n_clicks, input1, input2)
+
+
+@app.callback(Output('example-graph', 'figure'),
+              Input('submit-button-state', 'n_clicks'),
+              State('topic', 'value'),
+              State('depth', 'value'))
+
+def update_figure(n_klicks, topic, depth):
+    '''
+    generates a random network and corresponding plots
+    figure is updated with the new plots.
+    @param n_klicks: Wie oft wurde Button gedrückt.
+    @param topic: [String] Suchbegriff
+    @param depth: [Integer] Tiefe
+    '''
+    fig = go.Figure(data=generate_network(depth),
+                    layout=go.Layout(
+                    showlegend=False,
+                    hovermode='closest',
+                    margin=dict(b=20,l=5,r=5,t=40),
+                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                    )
+    return fig
+
 
 if __name__ == '__main__':
     app.run_server()
