@@ -79,3 +79,105 @@ def generate_network(n):
     return [edge_trace, node_trace] #ausgegeben werden die beiden Plots / Traces
 
 generate_network(10)
+
+# ===============================================================================
+# Layout der App
+
+# das Stylesheet ändert primär Schriftarten
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+# Erzeuge den Anfangsplot - hier wird n auf 64 gesetzt
+fig = go.Figure(data=generate_network(64),  # hier wird die Funktion von oben benutzt
+              layout=go.Layout(
+                showlegend=False,
+                hovermode='closest',
+                margin=dict(b=20,l=5,r=5,t=40), # ab hier nur Styling
+                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                )
+
+app.layout = html.Div([
+    html.H1("Hello"),
+    html.Div("Have fun with the progam!"),
+    html.Br(),
+    dcc.Input(id='topic', type='text', value='None'),
+    dcc.Input(id='depth', type='number', value=64),
+    html.Button(id='submit-button-state', n_clicks=0, children='Start'),
+    html.Div(id='output-state'),
+    html.Br(),
+    dcc.Graph(
+        id='example-graph',
+        figure=fig
+    )
+])
+
+
+
+# #===============================================================================
+# # Callbacks - Interaktion mit der Benutzeroberfläche
+
+
+# # Mit @ wird ein sogenannter "Decorater" benutzt.
+# # Der Decorator führt dazu, dass die Funktion, die darunter deklariert wird
+# # (hier update_output) die Funktionalität des Decorators erhält.
+# # Hier werden Input, Output, State vom Paket dash.dependencies verwendet (siehe import).
+# # Wichtig ist, dass Inputs und Outputs mit den Argumenten und Returns der Funktion zusammenpassen!
+
+# @app.callback(Output('output-state', 'children'),
+#               Input('submit-button-state', 'n_clicks'),
+#               State('topic', 'value'),
+#               State('depth', 'value'))
+
+# def update_output(n_clicks, input1, input2):
+#     '''
+#     displays the user inputs on the page
+#     @param n_clicks: [Integer] Anzahl, wie oft Programm gestartet wurde
+#     @param input1: [String] Suchbegriff
+#     @param input2: [Integer] Tiefe
+#     '''
+
+#     return u'''
+#         The program was started {} times,\n
+#         the topic is "{}",
+#         and the depth is "{}"
+#     '''.format(n_clicks, input1, input2)
+
+
+# @app.callback(Output('example-graph', 'figure'),
+#               Input('submit-button-state', 'n_clicks'),
+#               State('topic', 'value'),
+#               State('depth', 'value'))
+
+# def update_figure(n_klicks, topic, depth):
+#     '''
+#     generates a random network and corresponding plots
+#     figure is updated with the new plots.
+#     @param n_klicks: Wie oft wurde Button gedrückt.
+#     @param topic: [String] Suchbegriff
+#     @param depth: [Integer] Tiefe
+#     '''
+#     fig = go.Figure(data=generate_network(depth),
+#                     layout=go.Layout(
+#                     showlegend=False,
+#                     hovermode='closest',
+#                     margin=dict(b=20,l=5,r=5,t=40),
+#                     xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+#                     yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+#                     )
+#     return fig
+
+
+# #===============================================================================
+# # Server starten
+
+if __name__ == '__main__':
+    """Dieser Header wird immer ausgeführt, wenn das Skript direkt ausgeführt wird.
+    (Also z. B. in der Konsole mit python <scriptiscript.py>)
+    Der zu diesem Header eingerückte Codeblock wird also nicht ausgeführt,
+    wenn dieses Skript importiert wird.
+    [Anmerkung] Hier muss sonst kein Docstring hin, das ist nur ein Hinweis für euch.
+    Die Docstrings unter den Funktionsheadern habe ich weigehend
+    nach gängigen Konventionen angefertigt. ;)"""
+    app.run_server(debug=True)
