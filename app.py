@@ -138,8 +138,8 @@ app.layout = html.Div([
 
 @app.callback(Output('output-state', 'children'),
               Input('submit-button-state', 'n_clicks'),
-              State('topic', 'value'),
-              State('depth', 'value'))
+              [State('topic', 'value'),
+              State('depth', 'value')])
 
 def update_output(n_clicks, input1, input2):
     '''
@@ -156,6 +156,29 @@ def update_output(n_clicks, input1, input2):
     '''.format(n_clicks, input1, input2)
 
 ############# Fehler 2
+
+@app.callback(Output('example-graph', 'figure'),
+              Input('submit-button-state', 'n_clicks'),
+              [State('topic', 'value'),
+              State('depth', 'value')])
+
+def update_figure(n_klicks, topic, depth):
+    '''
+    generates a random network and corresponding plots
+    figure is updated with the new plots.
+    @param n_klicks: Wie oft wurde Button gedrückt.
+    @param topic: [String] Suchbegriff
+    @param depth: [Integer] Tiefe
+    '''
+    fig = go.Figure(data=generate_network(depth),
+                    layout=go.Layout(
+                    showlegend=False,
+                    hovermode='closest',
+                    margin=dict(b=20,l=5,r=5,t=40),
+                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                    )
+    return fig
 
 
 
