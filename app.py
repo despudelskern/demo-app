@@ -134,30 +134,29 @@ app.layout = html.Div([
 # Wichtig ist, dass Inputs und Outputs mit den Argumenten und Returns der Funktion zusammenpassen!
 
 
+############### Fehlerquelle 1
 
-
-@app.callback(Output('example-graph', 'figure'),
+@app.callback(Output('output-state', 'children'),
               Input('submit-button-state', 'n_clicks'),
               State('topic', 'value'),
               State('depth', 'value'))
 
-def update_figure(n_klicks, topic, depth):
+def update_output(n_clicks, input1, input2):
     '''
-    generates a random network and corresponding plots
-    figure is updated with the new plots.
-    @param n_klicks: Wie oft wurde Button gedrückt.
-    @param topic: [String] Suchbegriff
-    @param depth: [Integer] Tiefe
+    displays the user inputs on the page
+    @param n_clicks: [Integer] Anzahl, wie oft Programm gestartet wurde
+    @param input1: [String] Suchbegriff
+    @param input2: [Integer] Tiefe
     '''
-    fig = go.Figure(data=generate_network(depth),
-                    layout=go.Layout(
-                    showlegend=False,
-                    hovermode='closest',
-                    margin=dict(b=20,l=5,r=5,t=40),
-                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
-                    )
-    return fig
+
+    return u'''
+        The program was started {} times,\n
+        the topic is "{}",
+        and the depth is "{}"
+    '''.format(n_clicks, input1, input2)
+
+############# Fehler 2
+
 
 
 if __name__ == '__main__':
