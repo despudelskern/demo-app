@@ -112,8 +112,29 @@ app.layout = html.Div([
     html.H1("Hello"),
     html.Div("Have fun with the progam!"),
     html.Br(),
-    dcc.Input(id='topic', type='text', value='None'),
+    dcc.Input(id='topic', type='text', value='None', autoFocus=True),
     dcc.Input(id='depth', type='number', value=64),
+    
+    
+    html.Div([
+        dcc.Input(
+            id='my_txt_input',
+            type='text',
+            debounce=True,           # changes to input are sent to Dash server only on enter or losing focus
+            pattern=r"^[A-Za-z].*",  # Regex: string must start with letters only
+            spellCheck=True,
+            inputMode='latin',       # provides a hint to browser on type of data that might be entered by the user.
+            name='text',             # the name of the control, which is submitted with the form data
+            list='options',          # identifies a list of pre-defined options to suggest to the user
+        ),
+    ]),
+    
+    html.Datalist(id='options', children=[
+        html.Option(value="blue"),
+        html.Option(value="yellow"),
+        html.Option(value="green")
+    ]),
+    
     html.Button(id='submit-button-state', n_clicks=0, children='Start'),
     html.Div(id='output-state'),
     html.Br(),
@@ -136,12 +157,13 @@ app.layout = html.Div([
 ############### Fehlerquelle 1
 
 @app.callback(Output('output-state', 'children'),
-              [Input('submit-button-state', 'n_clicks')],
+              [Input('submit-button-state', 'n_clicks'),
+               Input('my_txt-input', 'value')],
               [State('topic', 'value'),
               State('depth', 'value')]
              )
 
-def update_output(n_clicks, input1, input2):
+def update_output(n_clicks, lang, input1, input2):
     '''
     displays the user inputs on the page
     @param n_clicks: [Integer] Anzahl, wie oft Programm gestartet wurde
@@ -151,9 +173,9 @@ def update_output(n_clicks, input1, input2):
 
     return u'''
         The program was started {} times,\n
-        the topic is "{}",
+        language is "{}" and the topic is "{}",
         and the depth is "{}"
-    '''.format(n_clicks, input1, input2)
+    '''.format(n_clicks, lang, input1, input2)
 
 ############# Fehler 2
 
