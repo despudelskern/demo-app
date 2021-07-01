@@ -152,7 +152,7 @@ def update_output(n_clicks, input1):
         The program was started {} times,\n
         the topic is "{}",
         and the depth is "{}"
-    '''.format(n_clicks, input1, input2)
+    '''.format(n_clicks, input1)
 
 ############# Fehler 2
 
