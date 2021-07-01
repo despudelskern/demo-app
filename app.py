@@ -115,27 +115,25 @@ app.layout = html.Div([
     dcc.Input(id='topic', type='text', value='None', autoFocus=True),
     dcc.Input(id='depth', type='number', value=64),
     
-    
-    html.Div([
-        dcc.Input(
-            id='my_txt_input',
-            type='text',
-            debounce=True,           # changes to input are sent to Dash server only on enter or losing focus
-            pattern=r"^[A-Za-z].*",  # Regex: string must start with letters only
-            spellCheck=True,
-            inputMode='latin',       # provides a hint to browser on type of data that might be entered by the user.
-            name='text',             # the name of the control, which is submitted with the form data
-            list='options',          # identifies a list of pre-defined options to suggest to the user
-        ),
-    ]),
-    
-    html.Datalist(id='options', children=[
-        html.Option(value="blue"),
-        html.Option(value="yellow"),
-        html.Option(value="green")
-    ]),
+    dcc.Input(
+        id='my_txt_input',
+        type='text',
+        value='en',
+        debounce=True,           # changes to input are sent to Dash server only on enter or losing focus
+        pattern=r"^[A-Za-z].*",  # Regex: string must start with letters only
+        inputMode='latin',       # provides a hint to browser on type of data that might be entered by the user.
+        name='text',             # the name of the control, which is submitted with the form data
+        list='options',          # identifies a list of pre-defined options to suggest to the user
+    ),
     
     html.Button(id='submit-button-state', n_clicks=0, children='Start'),
+    
+    html.Datalist(id='options', children=[
+        html.Option(value="en"),
+        html.Option(value="de"),
+        html.Option(value="fr")
+    ]),
+    
     html.Div(id='output-state'),
     html.Br(),
     dcc.Graph(
@@ -158,7 +156,7 @@ app.layout = html.Div([
 
 @app.callback(Output('output-state', 'children'),
               [Input('submit-button-state', 'n_clicks'),
-               Input('my_txt-input', 'value')],
+               Input('my_txt_input', 'value')],
               [State('topic', 'value'),
               State('depth', 'value')]
              )
