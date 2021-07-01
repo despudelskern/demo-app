@@ -133,12 +133,12 @@ app.layout = html.Div([
 # Hier werden Input, Output, State vom Paket dash.dependencies verwendet (siehe import).
 # Wichtig ist, dass Inputs und Outputs mit den Argumenten und Returns der Funktion zusammenpassen!
 
-
 ############### Fehlerquelle 1
 
 @app.callback(Output('output-state', 'children'),
-              Input('submit-button-state', 'n_clicks'),
-              State('topic', 'value'))
+              [Input('submit-button-state', 'n_clicks')],
+              [State('topic', 'value')]
+             )
 
 def update_output(n_clicks, input1):
     '''
