@@ -137,10 +137,11 @@ app.layout = html.Div([
 
 @app.callback(Output('output-state', 'children'),
               [Input('submit-button-state', 'n_clicks')],
-              [State('topic', 'value')]
+              [State('topic', 'value'),
+              State('depth', 'value')]
              )
 
-def update_output(n_clicks, input1):
+def update_output(n_clicks, input1, input2):
     '''
     displays the user inputs on the page
     @param n_clicks: [Integer] Anzahl, wie oft Programm gestartet wurde
@@ -152,7 +153,7 @@ def update_output(n_clicks, input1):
         The program was started {} times,\n
         the topic is "{}",
         and the depth is "{}"
-    '''.format(n_clicks, input1)
+    '''.format(n_clicks, input1, input2)
 
 ############# Fehler 2
 
