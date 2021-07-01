@@ -133,30 +133,7 @@ app.layout = html.Div([
 # Hier werden Input, Output, State vom Paket dash.dependencies verwendet (siehe import).
 # Wichtig ist, dass Inputs und Outputs mit den Argumenten und Returns der Funktion zusammenpassen!
 
-@app.callback(Output('output-state', 'children'),
-              Input('submit-button-state', 'n_clicks'),
-              State('topic', 'value'),
-              State('depth', 'value'))
 
-def update_output(n_clicks, input1, input2):
-    '''
-    displays the user inputs on the page
-    @param n_clicks: [Integer] Anzahl, wie oft Programm gestartet wurde
-    @param input1: [String] Suchbegriff
-    @param input2: [Integer] Tiefe
-    '''
-
-    return u'''
-        The program was started {} times,\n
-        the topic is "{}",
-        and the depth is "{}"
-    '''.format(n_clicks, input1, input2)
-
-
-@app.callback(Output('example-graph', 'figure'),
-              Input('submit-button-state', 'n_clicks'),
-              State('topic', 'value'),
-              State('depth', 'value'))
 
 def update_figure(n_klicks, topic, depth):
     '''
