@@ -135,6 +135,12 @@ app.layout = html.Div([
 
 
 
+
+@app.callback(Output('example-graph', 'figure'),
+              Input('submit-button-state', 'n_clicks'),
+              State('topic', 'value'),
+              State('depth', 'value'))
+
 def update_figure(n_klicks, topic, depth):
     '''
     generates a random network and corresponding plots
