@@ -2,13 +2,13 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
-
 import plotly.graph_objs as go
 import networkx as nx
 
 
-###########
 
+###############################################################################
+# Zufälliges Netzwerk; weg damit
 def generate_network(n):
     '''
     Generates a random geometric graph with n nodes. Analyzes the edges and
@@ -77,14 +77,7 @@ def generate_network(n):
     return [edge_trace, node_trace] #ausgegeben werden die beiden Plots / Traces
 
 
-########### Initiate the app
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-server = app.server
-app.title='MoK'
-
-
-# Erzeuge den Anfangsplot - hier wird n auf 64 gesetzt
+# Erzeuge den Anfangsplot
 fig = go.Figure(data=generate_network(64),  # hier wird die Funktion von oben benutzt
               layout=go.Layout(
                 showlegend=False,
@@ -94,6 +87,22 @@ fig = go.Figure(data=generate_network(64),  # hier wird die Funktion von oben be
                 yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
                 )
 
+##############################################################################
+
+## Ich brauche die Variable
+# fig = go.Figure(data=, layout=)
+
+
+
+
+# Initiate the app
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
+app.title='MoK'
+
+
+# App Layout
 app.layout = html.Div([
     html.H1("Map of Knowledge"),
     html.Div("Have fun with the progam!"),
@@ -131,14 +140,12 @@ app.layout = html.Div([
 #===============================================================================
 # Callbacks - Interaktion mit der Benutzeroberfläche
 
-
 # Mit @ wird ein sogenannter "Decorater" benutzt.
 # Der Decorator führt dazu, dass die Funktion, die darunter deklariert wird
 # (hier update_output) die Funktionalität des Decorators erhält.
 # Hier werden Input, Output, State vom Paket dash.dependencies verwendet (siehe import).
 # Wichtig ist, dass Inputs und Outputs mit den Argumenten und Returns der Funktion zusammenpassen!
 
-############### Fehlerquelle 1
 
 @app.callback(Output('output-state', 'children'),
               [Input('submit-button-state', 'n_clicks'),
@@ -161,7 +168,7 @@ def update_output(n_clicks, lang, input1, input2):
         and the depth is "{}"
     '''.format(n_clicks, lang, input1, input2)
 
-############# Fehler 2
+
 
 @app.callback(Output('example-graph', 'figure'),
               [Input('submit-button-state', 'n_clicks')],
