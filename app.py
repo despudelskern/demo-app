@@ -106,6 +106,7 @@ app.title='MoK'
 app.layout = html.Div([
     html.H1("Map of Knowledge"),
     html.Div("Have fun with the progam!"),
+    html.Div("You can enter your search term in the first box and the depth into the second box."),
     html.Br(),
     dcc.Input(id='topic', type='text', value='None', autoFocus=True),
     dcc.Input(id='depth', type='number', value=64),
