@@ -164,7 +164,7 @@ def update_output(n_clicks, lang, input1, input2):
 
     return u'''
         The program was started {} times,\n
-        language is "{}" and the topic is "{}",
+        language is "{}", the topic is "{}",
         and the depth is "{}"
     '''.format(n_clicks, lang, input1, input2)
 
