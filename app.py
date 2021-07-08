@@ -76,26 +76,12 @@ def generate_network(n):
 
     return [edge_trace, node_trace] #ausgegeben werden die beiden Plots / Traces
 
-########### Define your variables
-beers=['Chesapeake Stout', 'Snake Dog IPA', 'Imperial Porter', 'Double Dog IPA']
-ibu_values=[35, 60, 85, 75]
-abv_values=[5.4, 7.1, 9.2, 4.3]
-color1='darkred'
-color2='orange'
-mytitle='Beer Comparison'
-tabtitle='beer!'
-myheading='Flying Dog Beers'
-label1='IBU'
-label2='ABV'
-githublink='https://github.com/austinlasseter/flying-dog-beers'
-sourceurl='https://www.flyingdog.com/beers/'
-
 
 ########### Initiate the app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
-app.title=tabtitle
+app.title='MoK'
 
 
 # Erzeuge den Anfangsplot - hier wird n auf 64 gesetzt
@@ -109,7 +95,7 @@ fig = go.Figure(data=generate_network(64),  # hier wird die Funktion von oben be
                 )
 
 app.layout = html.Div([
-    html.H1("Hello"),
+    html.H1("Map of Knowledge"),
     html.Div("Have fun with the progam!"),
     html.Br(),
     dcc.Input(id='topic', type='text', value='None', autoFocus=True),
