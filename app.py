@@ -106,7 +106,7 @@ def createElements (title, tiefe, lang):
     def buildGraph(seite, tiefe):
         if tiefe == 0:
             return#void?
-        seite.filter_links(2)
+        seite.filter_links(5)
         for link in seite.links_filtered:
             curr_article = WikipediaArticle(search_term=link)
             curr_article.search_and_set_page()
