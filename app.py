@@ -1,22 +1,18 @@
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output, State
-import dash_cytoscape as cyto
-
-import plotly.graph_objs as go
-import networkx as nx
-
-# Wikipedia Klasse
-##############################################################################
-
-
 '''
 Requires
 pip install wikipedia
 OR
 pip install git+https://github.com/lucasdnd/Wikipedia.git
 
+Helpful:
+https://stackabuse.com/getting-started-with-pythons-wikipedia-api/
+
+ToDO:
+- Should first set page not search
+- Let user choose starting node if there is disambiguation
+- Error Handling with API
+	- starting article not existent
+	- No options
 '''
 
 
@@ -33,13 +29,11 @@ class WikipediaArticle():
 		# Weird init attributes are needed to recreate article from JSON
 		# Because of the "keywords arguments" (**kwargs)
 
-
 		wiki.set_lang(language)
 
 		self.search_term = search_term
 		self.page_name = page_name
 		self.page = page
-
 
 		self.links = links
 		self.links_filtered = links_filtered
@@ -118,14 +112,223 @@ class WikipediaArticle():
 		self.page = None
 
 
+#===============================================================================
+# Erstellung des Graphen
+
+
+
+import networkx as nx
+import plotly.graph_objects as go
+from WikipediaArticle import WikipediaArticle
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_cytoscape as cyto
+from dash.dependencies import Input, Output, State
+
+
+all_articles = []
+all_searchTerms = []
+G = nx.Graph()
+title = "14th Dalai Lama"
+seite = WikipediaArticle(search_term=title)
+#seite = title
+seite.search_and_set_page()
+all_articles.append(seite)
+all_searchTerms.append(title)
+G.add_node(seite)
+
+def buildGraph(seite, tiefe):
+    if tiefe == 0:
+        return#void?
+    seite.filter_links(3)
+    for link in seite.links_filtered:
+        curr_article = WikipediaArticle(search_term=link)
+        curr_article.search_and_set_page()
+        if curr_article.error==False:
+            G.add_edge(seite,curr_article)
+            if link not in all_searchTerms:
+                all_articles.append(curr_article)#was passiert, wenn artikel bereits vorhanden--> doppelt?
+                all_searchTerms.append(link)
+                G.add_node(curr_article)
+                buildGraph(curr_article, tiefe-1)
+    return
+buildGraph(seite, 2)
+#print(G.adj)
+#for article in all_articles:
+    #print(article.search_term)
+
+elements = []
+
+
+for node in G.nodes():
+    label = node.search_term
+    id = all_searchTerms.index(node.search_term)
+    eintrag = {'data': {'id': id, 'label': label}}
+    elements.append(eintrag)
+
+for edge in G.edges():
+    node0 = edge[0]
+    node1 = edge[1]
+    id0 = all_searchTerms.index(node0.search_term)
+    id1 = all_searchTerms.index(node1.search_term)
+    eintrag = {'data': {'source': id0, 'target': id1}}
+    elements.append(eintrag)
+
+
+#===============================================================================
+# visualisation with dash
+
+
+
+app = dash.Dash(__name__)
+
+
+styles = {
+    'pre': {
+        'border': 'thin lightgrey solid',
+        'overflowX': 'scroll'
+    }
+}
+
+default_stylesheet = [
+    {
+        'selector': 'node',
+        'style': {
+            'background-color': '#BFD7B5',
+            'label': 'data(label)'
+        }
+    },
+    {
+        'selector': '[id = "0"]',
+        'style': {
+            'background-color': 'red',
+            'line-color': 'red'
+        }
+    },
+    {
+        'selector': 'edge',
+        'style': {
+        # The default curve style does not work with certain arrows
+        'curve-style': 'bezier'
+        }
+    },
+    {
+        'selector': 'edge',
+        'style': {
+            'target-arrow-color': 'lightblue',
+            'target-arrow-shape': 'vee',
+            'line-color': 'lightblue'
+        }
+    }""",
+    {
+        'selector': '[weight = …']
+        'style': {
+            je mehr Verbindungen, desto dunkler/heller
+        }
+    }
+"""
+]
+'''
+app.layout = html.Div([
+    html.Div([
+        html.P("Map of Knowledge:"),
+        html.Button("Responsive Toggle", id='toggle-button'),
+        html.Div(id='toggle-text')
+    ]),
+    html.Div([
+        cyto.Cytoscape(
+            id='cytoscape-responsive-layout',
+            layout={'name': 'cose'},
+            elements=elements,
+            responsive=True,
+            stylesheet=default_stylesheet,
+            style={'width': '100%', 'height': '450px'})
+    ])
+#    ),
+#    html.P(id='cytoscape-tapNodeData-output'),
+#    html.P(id='cytoscape-tapEdgeData-output'),
+#    html.P(id='cytoscape-mouseoverNodeData-output'),
+#    html.P(id='cytoscape-mouseoverEdgeData-output')
+])
+'''
+'''
+app.layout = html.Div([
+    html.P("Map of Knowledge:"),
+    cyto.Cytoscape(
+        id='cytoscape-event-callbacks-2',
+        layout={'name': 'cose'},
+        elements=elements,
+        #responsive=True,
+        stylesheet=default_stylesheet,
+        style={'width': '100%', 'height': '100%'}
+    ),
+    html.P(id='cytoscape-tapNodeData-output'),
+    html.P(id='cytoscape-tapEdgeData-output'),
+    html.P(id='cytoscape-mouseoverNodeData-output'),
+    html.P(id='cytoscape-mouseoverEdgeData-output')
+])
+'''
+
+#anpassen
+'''
+@app.callback(Output('cytoscape-tapNodeData-output', 'children'),
+              Input('cytoscape-event-callbacks-2', 'tapNodeData'))
+def displayTapNodeData(data):
+    if data:
+        return "You recently clicked/tapped the article: " + data['label']
+
+
+@app.callback(Output('cytoscape-tapEdgeData-output', 'children'),
+              Input('cytoscape-event-callbacks-2', 'tapEdgeData'))
+def displayTapEdgeData(data):
+    if data:
+        return "You recently clicked/tapped the edge between " + data['source'].upper() + " and " + data['target'].upper()
+'''
+'''
+@app.callback(Output('cytoscape-mouseoverNodeData-output', 'children'),
+              Input('cytoscape-event-callbacks-2', 'mouseoverNodeData'))
+def displayTapNodeData(data):
+    if data:
+        return data['label']
+
+
+@app.callback(Output('cytoscape-mouseoverEdgeData-output', 'children'),
+              Input('cytoscape-event-callbacks-2', 'mouseoverEdgeData'))
+def displayTapEdgeData(data):
+    if data:
+        return "You recently hovered over the edge between " + data['source'].upper() + " and " + data['target'].upper()
+
+
+@app.callback(Output('cytoscape-responsive-layout', 'responsive'), Input('toggle-button', 'n_clicks'))
+def toggle_responsive(n_clicks):
+    n_clicks = 2 if n_clicks is None else n_clicks
+    toggle_on = n_clicks % 2 == 0
+    return toggle_on
+
+
+
+if __name__ == '__main__':
+    app.run_server(debug=True, port=8052)
+'''
+
+#===============================================================================
+# heroku
+
+import plotly.graph_objs as go
+
+
+
 ###############################################################################
 # Zufälliges Netzwerk; weg damit
+'''
 def generate_network(n):
     '''
-    Generates a random geometric graph with n nodes. Analyzes the edges and
-    nodes, so that corresponding graphs can be generated. The function returns
-    the graphs.
-    @param n: Anzahl der Knoten.
+#    Generates a random geometric graph with n nodes. Analyzes the edges and
+#    nodes, so that corresponding graphs can be generated. The function returns
+#    the graphs.
+#    @param n: Anzahl der Knoten.
     '''
     G = nx.random_geometric_graph(n, 0.2)   # erzeugt einen zufälligen Graphen mit n Knoten
 
@@ -197,94 +400,20 @@ fig = go.Figure(data=generate_network(64),  # hier wird die Funktion von oben be
                 xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                 yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
                 )
-
+'''
 ##############################################################################
 
 ## Ich brauche die Variable
 # fig = go.Figure(data=, layout=)
 
 
-all_articles = []
-all_searchTerms = []
-G = nx.Graph()
-title = "Barack Obam"
-seite = WikipediaArticle(search_term=title)
-#seite = title
-seite.search_and_set_page()
-all_articles.append(seite)
-all_searchTerms.append(title)
-G.add_node(seite)
-
-def buildGraph(seite, tiefe):
-    if tiefe == 0:
-        return#void?
-    seite.filter_links(3)
-    for link in seite.links_filtered:
-        curr_article = WikipediaArticle(search_term=link)
-        curr_article.search_and_set_page()
-        if curr_article.error==False:
-            G.add_edge(seite,curr_article)
-            if link not in all_searchTerms:
-                all_articles.append(curr_article)#was passiert, wenn artikel bereits vorhanden--> doppelt?
-                all_searchTerms.append(link)
-                G.add_node(curr_article)
-                buildGraph(curr_article, tiefe-1)
-    return
-buildGraph(seite, 1)
-#print(G.adj)
-#for article in all_articles:
-    #print(article.search_term)
-
-elements = []
-
-
-for node in G.nodes():
-    label = node.search_term
-    id = all_searchTerms.index(node.search_term)
-    eintrag = {'data': {'id': id, 'label': label}}
-    elements.append(eintrag)
-
-for edge in G.edges():
-    node0 = edge[0]
-    node1 = edge[1]
-    id0 = all_searchTerms.index(node0.search_term)
-    id1 = all_searchTerms.index(node1.search_term)
-    eintrag = {'data': {'source': id0, 'target': id1}}
-    elements.append(eintrag)
-
-
-#===============================================================================
-# visualisation with dash
-
-app = dash.Dash(__name__)
-
-
-styles = {
-    'pre': {
-        'border': 'thin lightgrey solid',
-        'overflowX': 'scroll'
-    }
-}
-
-default_stylesheet = [
-    {
-        'selector': 'node',
-        'style': {
-            'background-color': '#BFD7B5',
-            'label': 'data(label)'
-        }
-    }
-]
-
-
 
 
 # Initiate the app
-# external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-# app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 app.title='MoK'
-
 
 
 # App Layout
@@ -295,7 +424,7 @@ app.layout = html.Div([
     html.Br(),
     dcc.Input(id='topic', type='text', value='None', autoFocus=True),
     dcc.Input(id='depth', type='number', value=64),
-    
+
     dcc.Input(
         id='my_txt_input',
         type='text',
@@ -306,33 +435,39 @@ app.layout = html.Div([
         name='text',             # the name of the control, which is submitted with the form data
         list='options',          # identifies a list of pre-defined options to suggest to the user
     ),
-    
+
     html.Button(id='submit-button-state', n_clicks=0, children='Start'),
-    
+
     html.Datalist(id='options', children=[
         html.Option(value="en"),
         html.Option(value="de"),
         html.Option(value="fr")
     ]),
-    
+
     html.Div(id='output-state'),
     html.Br(),
-    dcc.Graph(
-        id='example-graph',
-        figure=fig
-    ),
-    
-    cyto.Cytoscape(
-        id='cytoscape-event-callbacks-2',
-        layout={'name': 'cose'},
-        elements=elements,
-        stylesheet=default_stylesheet,
-        style={'width': '100%', 'height': '450px'}
-    ),
-    html.P(id='cytoscape-tapNodeData-output'),
-    html.P(id='cytoscape-tapEdgeData-output'),
-    html.P(id='cytoscape-mouseoverNodeData-output'),
-    html.P(id='cytoscape-mouseoverEdgeData-output')
+	html.Div([
+	    html.Div([
+	        html.P("Map of Knowledge:"),
+	        html.Button("Responsive Toggle", id='toggle-button'),
+	        html.Div(id='toggle-text')
+	    ]),
+	    html.Div([
+	        cyto.Cytoscape(
+	            id='cytoscape-responsive-layout',
+	            layout={'name': 'cose'},
+	            elements=elements,
+	            responsive=True,
+	            stylesheet=default_stylesheet,
+	            style={'width': '100%', 'height': '450px'})
+	    ])
+	#    ),
+	#    html.P(id='cytoscape-tapNodeData-output'),
+	#    html.P(id='cytoscape-tapEdgeData-output'),
+	#    html.P(id='cytoscape-mouseoverNodeData-output'),
+	#    html.P(id='cytoscape-mouseoverEdgeData-output')
+	])
+    )
 ])
 
 #===============================================================================
@@ -374,13 +509,36 @@ def update_output(n_clicks, lang, input1, input2):
               State('depth', 'value')]
              )
 
-def update_figure(n_klicks, topic, depth):
-    '''
-    generates a random network and corresponding plots
-    figure is updated with the new plots.
-    @param n_klicks: Wie oft wurde Button gedrückt.
-    @param topic: [String] Suchbegriff
-    @param depth: [Integer] Tiefe
+@app.callback(Output('cytoscape-mouseoverNodeData-output', 'children'),
+              Input('cytoscape-event-callbacks-2', 'mouseoverNodeData'))
+def displayTapNodeData(data):
+    if data:
+        return data['label']
+
+
+@app.callback(Output('cytoscape-mouseoverEdgeData-output', 'children'),
+              Input('cytoscape-event-callbacks-2', 'mouseoverEdgeData'))
+def displayTapEdgeData(data):
+    if data:
+        return "You recently hovered over the edge between " + data['source'].upper() + " and " + data['target'].upper()
+
+
+@app.callback(Output('cytoscape-responsive-layout', 'responsive'), Input('toggle-button', 'n_clicks'))
+def toggle_responsive(n_clicks):
+    n_clicks = 2 if n_clicks is None else n_clicks
+    toggle_on = n_clicks % 2 == 0
+    return toggle_on
+
+
+
+
+#def update_figure(n_klicks, topic, depth):
+#	'''
+#    generates a random network and corresponding plots
+#    figure is updated with the new plots.
+#    @param n_klicks: Wie oft wurde Button gedrückt.
+#    @param topic: [String] Suchbegriff
+#    @param depth: [Integer] Tiefe
     '''
     fig = go.Figure(data=generate_network(depth),
                     layout=go.Layout(
@@ -391,35 +549,8 @@ def update_figure(n_klicks, topic, depth):
                     yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
                     )
     return fig
-
-@app.callback(Output('cytoscape-tapNodeData-output', 'children'),
-              Input('cytoscape-event-callbacks-2', 'tapNodeData'))
-def displayTapNodeData(data):
-    if data:
-        return "You recently clicked/tapped the city: " + data['label']
-
-
-@app.callback(Output('cytoscape-tapEdgeData-output', 'children'),
-              Input('cytoscape-event-callbacks-2', 'tapEdgeData'))
-def displayTapEdgeData(data):
-    if data:
-        return "You recently clicked/tapped the edge between " + data['source'].upper() + " and " + data['target'].upper()
-
-
-@app.callback(Output('cytoscape-mouseoverNodeData-output', 'children'),
-              Input('cytoscape-event-callbacks-2', 'mouseoverNodeData'))
-def displayTapNodeData(data):
-    if data:
-        return "You recently hovered over the city: " + data['label']
-
-
-@app.callback(Output('cytoscape-mouseoverEdgeData-output', 'children'),
-              Input('cytoscape-event-callbacks-2', 'mouseoverEdgeData'))
-def displayTapEdgeData(data):
-    if data:
-        return "You recently hovered over the edge between " + data['source'].upper() + " and " + data['target'].upper()
-
+	'''
 
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True, port=8052)
