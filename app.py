@@ -168,7 +168,11 @@ app.layout = html.Div([
 def update_figure(n_klicks, topic, depth, lang):
     return createElements(topic, depth, lang)
 
-
+# Layout
+@app.callback(Output('cytoscape', 'layout'),
+              [Input('dropdown-layout', 'value')])
+def update_cytoscape_layout(layout):
+    return {'name': layout}
 
 
 if __name__ == '__main__':
