@@ -105,9 +105,71 @@ default_stylesheet = [
 
 # define layout
 app.layout = html.Div([
+    
     html.H1("Map of Knowledge"),
     html.Div("Have fun with the progam!"),
+    html.Br(),    
+    
+    dcc.Input(id='topic', type='text', value='hallo', autoFocus=True),
+    dcc.Input(id='depth', type='number', value=2),
+    
+    # Language Dropdown
+    dcc.Dropdown(
+            id='language-dropdown',
+            options=[
+                {'label': 'english',
+                 'value': 'en'},
+                {'label': 'french',
+                 'value': 'fr'},
+                {'label': 'german',
+                 'value': 'de'}
+            ], value='en'
+        ),
+    
+    # Layout Dropdown
+    dcc.Dropdown(
+            id='dropdown-layout',
+            options=[
+                {'label': 'random',
+                 'value': 'random'},
+                {'label': 'grid',
+                 'value': 'grid'},
+                {'label': 'circle',
+                 'value': 'circle'},
+                {'label': 'concentric',
+                 'value': 'concentric'},
+                {'label': 'breadthfirst',
+                 'value': 'breadthfirst'},
+                {'label': 'cose',
+                 'value': 'cose'}
+            ], value='cose'
+        ),
+    
+    html.Button(id='submit-button-state', n_clicks=0, children='Start'),
+
+    # html.Div([
+    cyto.Cytoscape(
+            id='cytoscape',
+            elements=[],
+            style={
+                'height': '350px',
+                'width': '100%'},
+            stylesheet=default_stylesheet
+        )
+    # ])
 ])
+
+# Graph
+@app.callback(Output('cytoscape', 'elements'),
+              [Input('submit-button-state', 'n_clicks')],
+              [State('topic', 'value'),
+              State('depth', 'value'),
+              State('language-dropdown', 'value')])
+def update_figure(n_klicks, topic, depth, lang):
+    return createElements(topic, depth, lang)
+
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=False)
