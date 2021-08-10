@@ -1,3 +1,8 @@
+from WikipediaArticle import WikipediaArticle
+
+str = WikipediaArticle("Hund")
+print("Es klappt!!")
+
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
