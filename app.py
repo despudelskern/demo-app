@@ -1,8 +1,3 @@
-from WikipediaArticle import WikipediaArticle
-
-str = WikipediaArticle("Hund")
-print("Es klappt!!")
-
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -12,89 +7,92 @@ import dash_cytoscape as cyto
 import networkx as nx
 
 #%%
-import wikipedia as wiki
+
 #import numpy # For Runtime purposes
 
-class WikipediaArticle():
-	"""
-	-- An Wikipedia Article --
-	
-	initialize with 
-	WikipediaArticle(ARTICLE_NAME_HERE)
+from WikipediaArticle import WikipediaArticle
 
-	to use given PAGE_NAME call 
-	search_and_set_page() 
+# import wikipedia as wiki
+# class WikipediaArticle():
+# 	"""
+# 	-- An Wikipedia Article --
+# 	
+# 	initialize with 
+# 	WikipediaArticle(ARTICLE_NAME_HERE)
 
-	then all attributes seen below in __init__ are usable:
-	"""
+# 	to use given PAGE_NAME call 
+# 	search_and_set_page() 
 
-	def __init__(self, search_term, language = "en"): 
-		wiki.set_lang(language) 
-		self.search_term = search_term
+# 	then all attributes seen below in __init__ are usable:
+# 	"""
 
-		self.page_name = None
-		self.page = None
+# 	def __init__(self, search_term, language = "en"): 
+# 		wiki.set_lang(language) 
+# 		self.search_term = search_term
 
-		self.links = None
-		self.links_filtered = None
-		self.references = None
-		self.references_filtered = None
-		self.categories = None
-		self.categories_filtered = None
-		self.content = None
-		self.content_filtered = None
+# 		self.page_name = None
+# 		self.page = None
 
-		self.title = None
-		self.url = None
-		self.summary = None
+# 		self.links = None
+# 		self.links_filtered = None
+# 		self.references = None
+# 		self.references_filtered = None
+# 		self.categories = None
+# 		self.categories_filtered = None
+# 		self.content = None
+# 		self.content_filtered = None
 
-		self.error = False
+# 		self.title = None
+# 		self.url = None
+# 		self.summary = None
 
-	def search_and_set_page(self):
-		self.page_name = self.search_term 
+# 		self.error = False
 
-		try:
-			print("TRYING: ", self.page_name, end=' ')	
-			self.set_page()
-			print("{*} SUCCESS")
+# 	def search_and_set_page(self):
+# 		self.page_name = self.search_term 
 
-		except wiki.DisambiguationError as e:
-			best_guess = e.options[1] #Take the first of the options
-			print("GUESSING: ", best_guess)
+# 		try:
+# 			print("TRYING: ", self.page_name, end=' ')	
+# 			self.set_page()
+# 			print("{*} SUCCESS")
 
-			self.page_name = best_guess
-			self.set_page()
+# 		except wiki.DisambiguationError as e:
+# 			best_guess = e.options[1] #Take the first of the options
+# 			print("GUESSING: ", best_guess)
 
-		except wiki.PageError as e:
-			print("ERROR! Page doesnt exist:", self.page_name)
-			self.error = True
-			return
+# 			self.page_name = best_guess
+# 			self.set_page()
 
-	def set_page(self): # Can be used directly if there is no disambiguation for sure
-		self.page = wiki.page(self.page_name, auto_suggest=False) 
-		self.summary = wiki.summary(self.page_name, auto_suggest=False)
-		# Auto suggestion causes weird errors. Like "Dog" turning to "Do" in the search
+# 		except wiki.PageError:
+# 			print("ERROR! Page doesnt exist:", self.page_name)
+# 			self.error = True
+# 			return
 
-	def filter(self, num): # Filter out data
-		self.filter_links(num)
-		#self.filter_content(num)
-		#self.filter_references(num)
-		#self.filter_categories(num)
+# 	def set_page(self): # Can be used directly if there is no disambiguation for sure
+# 		self.page = wiki.page(self.page_name, auto_suggest=False) 
+# 		self.summary = wiki.summary(self.page_name, auto_suggest=False)
+# 		# Auto suggestion causes weird errors. Like "Dog" turning to "Do" in the search
 
-	def filter_links(self, num):
-		self.links_filtered = self.page.links[:num] # Get first ... links
+# 	def filter(self, num): # Filter out data
+# 		self.filter_links(num)
+# 		#self.filter_content(num)
+# 		#self.filter_references(num)
+# 		#self.filter_categories(num)
 
-		#self.links_filtered = numpy.array(self.page.links)[:num] 
-		# Using numpy should be faster but isnt ... hmmm
-	
-	def filter_content(self, num):
-		self.content_filtered = self.page.content[:num]
+# 	def filter_links(self, num):
+# 		self.links_filtered = self.page.links[:num] # Get first ... links
 
-	def filter_references(self, num):
-		self.references_filtered = self.page.references[:num]
+# 		#self.links_filtered = numpy.array(self.page.links)[:num] 
+# 		# Using numpy should be faster but isnt ... hmmm
+# 	
+# 	def filter_content(self, num):
+# 		self.content_filtered = self.page.content[:num]
 
-	def filter_categories(self, num):
-		self.categories_filtered = self.page.categories[:num]
+# 	def filter_references(self, num):
+# 		self.references_filtered = self.page.references[:num]
+
+# 	def filter_categories(self, num):
+# 		self.categories_filtered = self.page.categories[:num]
 
 #%%
 def createElements (title, tiefe, lang):    
@@ -111,7 +109,7 @@ def createElements (title, tiefe, lang):
     def buildGraph(seite, tiefe):
         if tiefe == 0:
             return#void?
-        seite.filter_links(2)
+        seite.filter_links(3)
         for link in seite.links_filtered:
             curr_article = WikipediaArticle(search_term=link)
             curr_article.search_and_set_page()
@@ -231,12 +229,17 @@ app.layout = html.Div([
     
     html.Button(id='submit-button-state', n_clicks=0, children='Start'),
 
+    html.P(id='tapNodeData'),
+    html.P(id='tapEdgeData'),
+    html.P(id='mouseoverNodeData'),
+    html.P(id='mouseoverEdgeData'),
+
     # html.Div([
     cyto.Cytoscape(
             id='cytoscape',
             elements=[],
             style={
-                'height': '450px',
+                'height': '350px',
                 'width': '100%'},
             stylesheet=default_stylesheet
         )
@@ -248,11 +251,9 @@ app.layout = html.Div([
               [Input('submit-button-state', 'n_clicks')],
               [State('topic', 'value'),
               State('depth', 'value'),
-              State('language-dropdown', 'value')]
-              )
+              State('language-dropdown', 'value')])
 def update_figure(n_klicks, topic, depth, lang):
     return createElements(topic, depth, lang)
-
 
 # Layout
 @app.callback(Output('cytoscape', 'layout'),
@@ -260,6 +261,28 @@ def update_figure(n_klicks, topic, depth, lang):
 def update_cytoscape_layout(layout):
     return {'name': layout}
 
+
+# Text Output
+@app.callback(Output('tapNodeData', 'children'),
+              Input('cytoscape', 'tapNodeData'))
+def displayTapNodeData(data):
+    if data: return "You recently clicked/tapped the article: " + data['label']
+
+
+@app.callback(Output('tapEdgeData', 'children'),
+              Input('cytoscape', 'tapEdgeData'))
+def displayTapEdgeData(data):
+    if data: return "You recently clicked/tapped the edge between " + data['source'].upper() + " and " + data['target'].upper()
+
+@app.callback(Output('mouseoverNodeData', 'children'),
+              Input('cytoscape', 'mouseoverNodeData'))
+def displayHoverNodeData(data):
+    if data: return data['label']
+
+@app.callback(Output('mouseoverEdgeData', 'children'),
+              Input('cytoscape', 'mouseoverEdgeData'))
+def displayHoverEdgeData(data):
+    if data: return "You recently hovered over the edge between " + data['source'].upper() + " and " + data['target'].upper()
 
 
 if __name__ == '__main__':
