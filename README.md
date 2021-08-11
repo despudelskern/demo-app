@@ -20,7 +20,7 @@ In diesem Zusammenhang wollen wir diese Features miteinbauen:
 
 Um unseren Graphen auch graphisch darzustellen nutzen wie Dash. Dash ist eine Anwendung von plotly, in der in unserem Fall mit Python programmiert werden kann und
 
-Falls ihr mehr über Dash erfahren wollt, findet ihr [hier] (https://dash.plotly.com/) mehr Informationen dazu.
+Falls ihr mehr über Dash erfahren wollt, findet ihr [hier](https://dash.plotly.com/) mehr Informationen dazu.
 
 Dash arbeitet lokal, das bedeutet die grafische Visualisierung
 
