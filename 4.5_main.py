@@ -258,10 +258,10 @@ def update_metrics(n):
 
 # Graph
 @app.callback(Output('cytoscape', 'elements'),
-              [Input('start-button', 'n_clicks'),
-              Input('topic', 'value'),
-              Input('Depth', 'value'),
-              Input('dropdown_language', 'value')])
+              [Input('start-button', 'n_clicks')],
+              [State('topic', 'value'),
+              State('Depth', 'value'),
+              State('dropdown_language', 'value')])
 def update_graph(n_clicks, topic, Depth, dropdown_language):
     return createElements(topic, Depth, dropdown_language)
 
