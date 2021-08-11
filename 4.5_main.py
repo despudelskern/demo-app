@@ -267,7 +267,7 @@ def update_graph(n_clicks, topic, Depth, dropdown_language):
 
 # Layout
 @app.callback(Output('cytoscape', 'layout'),
-              [Input('dropdown_layout', 'value')])
+              [State('dropdown_layout', 'value')])
 def update_cytoscape_layout(dropdown_layout):
     return {'name': dropdown_layout}
 
