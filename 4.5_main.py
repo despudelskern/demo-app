@@ -127,10 +127,10 @@ controls = dbc.Card(
         dbc.FormGroup(
             [
                 dbc.Label("Depth"),
-                dbc.Input(id='Depth', type='number', placeholder='Set a depth') #value=2),
+                dbc.Input(id='Depth', type='number', placeholder='Set a depth')
             ]
         ),
-		# Language
+		# language
         dbc.FormGroup(
             [
                 dbc.Label("Language"),
@@ -144,12 +144,11 @@ controls = dbc.Card(
  		                 'value': 'fr'},
 		                {'label': 'german',
  		                 'value': 'de'}
-		            ], #value='en'
- 					placeholder='Select a language'
+		            ], placeholder='Select a language'
 		        ),
             ]
         ),
-		#Layout
+		# layout
         dbc.FormGroup(
             [
                 dbc.Label("Layout"),
@@ -170,7 +169,6 @@ controls = dbc.Card(
  		                 'value': 'cose'}
 		            ], value='cose',
 		        ),
-		#	],
             ]
         ),
 
@@ -180,7 +178,6 @@ controls = dbc.Card(
             dbc.Button(
                 "Start", id="start-button", outline=True, color="primary", size="lg", className="mr-2", n_clicks=0
                 )
-				#html.Button(id='submit-button-state', n_clicks=0, children='Start'),
             ]
         ),
     ],
@@ -259,22 +256,14 @@ def update_metrics(n):
     return el
 '''
 
+# Graph
 @app.callback(Output('cytoscape', 'elements'),
-              #Output('cytoscape', 'layout'),
               [Input('start-button', 'n_clicks'),
               Input('topic', 'value'),
               Input('Depth', 'value'),
-              Input('dropdown_language', 'value')])#,
-             # Input('dropdown_layout', 'value')])#,
-            #  [State('topic', 'value'),
-             # State('depth', 'value'),
-              #State('dropdown_language', 'value'),
-              #State('dropdown_language', 'value')])
+              Input('dropdown_language', 'value')])
 def update_graph(n_clicks, topic, Depth, dropdown_language):
-    return createElements(topic, Depth, dropdown_language)#dbc.Card(
-#def update_cytoscape_layout(dropdown_layout):
-#    return {'name': layout}
-
+    return createElements(topic, Depth, dropdown_language)
 
 # Layout
 @app.callback(Output('cytoscape', 'layout'),
