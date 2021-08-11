@@ -18,7 +18,7 @@ In diesem Zusammenhang wollen wir diese Features miteinbauen:
 
 ### Graph im Webbrowser darstellen
 
-Um unseren Graphen auch graphisch darzustellen nutzen wie Dash. Dash ist eine Anwendung von plotly, in der in unserem Fall mit Python programmiert werden kann und
+Um unseren Graphen auch graphisch darzustellen nutzen wir Dash. Dash ist eine Anwendung von plotly, in der in unserem Fall mit Python programmiert werden kann und
 
 Falls ihr mehr über Dash erfahren wollt, findet ihr [hier](https://dash.plotly.com/) mehr Informationen dazu.
 
